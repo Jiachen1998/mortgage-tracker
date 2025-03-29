@@ -11,36 +11,64 @@ const options = {
     definition: {
       openapi: '3.0.0',
       info: {
-        title: 'My API',
+        title: 'Transaction API',
         version: '1.0.0',
+        description: 'API for managing transactions'
       },
+      components: {
+        schemas: {
+          Transaction: {
+            type: 'object',
+            required: ['Date', 'Client', 'Deposit'],
+            properties: {
+              Date: {
+                type: 'string',
+                format: 'date',
+                description: 'Transaction date'
+              },
+              Client: {
+                type: 'string',
+                description: 'Client name'
+              },
+              Deposit: {
+                type: 'number',
+                description: 'Deposit amount'
+              }
+            }
+          }
+        }
+      }
     },
-    // Paths to files containing OpenAPI definitions
-    apis: ['./routes/*.js'],
-  };
+    apis: ['./transactions/routes.js'], // Path to the API routes
+};
 const swaggerSpec = swaggerJsdoc(options);
 
-// Serve Swagger UI at /api-docs
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.listen(3000, () => console.log('Server running on port 3000'));
-
-const port = process.env.PORT || 3001;
+// Get port from environment variable or use default
+const port = process.env.PORT || 3002;
 
 // Middleware to parse JSON
 app.use(express.json());
 
-// Connect to MongoDB
+// Serve Swagger UI at /api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Connect to MongoDB with specific database
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  dbName: 'mortgage-tracker' // Explicitly specify database name
 })
-.then(() => console.log('Connected to MongoDB'))
+.then(() => {
+  console.log('Connected to MongoDB Database:', mongoose.connection.db.databaseName);
+  console.log('Available collections:', mongoose.connection.collections);
+})
 .catch(err => console.error('MongoDB connection error:', err));
 
 // Mount the deposit routes
 const transactionRoutes = require('./transactions/routes');
 app.use('/api/transactions', transactionRoutes);
 
+// Start server (only once!)
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
