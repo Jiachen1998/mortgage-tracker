@@ -11,8 +11,18 @@ import {
   CardHeader,
   CardBody,
   Text,
-  Heading
+  Heading,
+  Select,
+  InputGroup,
+  InputLeftAddon
 } from '@chakra-ui/react';
+
+// Add this enum before the Transaction interface
+enum ClientNames {
+  JIACHEN_LU = "Jiachen",
+  JIALIN_LU = "Jialin",
+  // Add more clients here
+}
 
 interface Transaction {
   Date: string;
@@ -28,7 +38,7 @@ export default function MakePayment() {
     Deposit: 0
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setTransaction(prev => ({
       ...prev,
@@ -95,26 +105,40 @@ export default function MakePayment() {
 
               <FormControl isRequired>
                 <FormLabel>Client Name</FormLabel>
-                <Input
-                  type="text"
+                <Select
                   name="Client"
                   value={transaction.Client}
                   onChange={handleInputChange}
-                  placeholder="Enter client name"
-                />
+                  placeholder="Select client"
+                  sx={{
+                    '& option[value=""]': {
+                      display: 'none'
+                    }
+                  }}
+                >
+                  {Object.values(ClientNames).map((clientName) => (
+                    <option key={clientName} value={clientName}>
+                      {clientName}
+                    </option>
+                  ))}
+                </Select>
               </FormControl>
 
               <FormControl isRequired>
                 <FormLabel>Deposit Amount</FormLabel>
-                <Input
-                  type="number"
-                  name="Deposit"
-                  value={transaction.Deposit}
-                  onChange={handleInputChange}
-                  placeholder="Enter deposit amount"
-                  min={0}
-                  step={0.01}
-                />
+                <InputGroup>
+                  <InputLeftAddon children="$" />
+                  <Input
+                    type="number"
+                    name="Deposit"
+                    value={transaction.Deposit.toFixed(2)}
+                    onChange={handleInputChange}
+                    placeholder="0.00"
+                    min={0}
+                    step={0.01}
+                    textAlign="right"
+                  />
+                </InputGroup>
               </FormControl>
 
               <Button
