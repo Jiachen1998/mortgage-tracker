@@ -27,7 +27,7 @@ const routes = [
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: <MainDashboard />,
   },
-  {
+  /*{
     name: 'NFT Marketplace',
     layout: '/admin',
     path: '/nft-marketplace',
@@ -55,6 +55,13 @@ const routes = [
     path: '/profile',
     icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
     component: <Profile />,
+  },*/
+  {
+    name: 'Make Payment',
+    layout: '/admin',
+    path: '/make-payment',
+    icon: <Icon as={MdPayment} width="20px" height="20px" color="inherit" />,
+    component: <MakePayment />,
   },
   {
     name: 'Sign In',
@@ -63,20 +70,13 @@ const routes = [
     icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
     component: <SignInCentered />,
   },
-  {
+  /*{
     name: 'RTL Admin',
     layout: '/rtl',
     path: '/rtl-default',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: <RTL />,
-  },
-  {
-    name: 'Make Payment',
-    layout: '/admin',
-    path: '/make-payment',
-    icon: <Icon as={MdPayment} width="20px" height="20px" color="inherit" />,
-    component: <MakePayment />,
-  },
+  },*/
 ];
 
 export default routes;
