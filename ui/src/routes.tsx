@@ -6,6 +6,7 @@ import {
   MdLock,
   MdOutlineShoppingCart,
   MdPayment,
+  MdUpload,
 } from 'react-icons/md';
 
 // Admin Imports
@@ -15,6 +16,7 @@ import Profile from 'views/admin/profile';
 import DataTables from 'views/admin/dataTables';
 import RTL from 'views/admin/rtl';
 import MakePayment from 'views/admin/makePayment';
+import BulkUpload from 'views/admin/bulkUpload';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
@@ -57,11 +59,18 @@ const routes = [
     component: <Profile />,
   },*/
   {
-    name: 'Make Payment',
+    name: 'Log Payment',
     layout: '/admin',
     path: '/make-payment',
     icon: <Icon as={MdPayment} width="20px" height="20px" color="inherit" />,
     component: <MakePayment />,
+  },
+  {
+    name: 'Bulk Upload',
+    layout: '/admin',
+    path: '/bulk-upload',
+    icon: <Icon as={MdUpload} width="20px" height="20px" color="inherit" />,
+    component: <BulkUpload />,
   },
   {
     name: 'Sign In',

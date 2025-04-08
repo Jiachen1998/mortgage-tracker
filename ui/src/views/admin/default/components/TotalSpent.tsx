@@ -31,6 +31,7 @@ export default function TotalSpent(props: { [x: string]: any }) {
 	const [loading, setLoading] = useState(true);
 	const [totalDeposit, setTotalDeposit] = useState(0);
 	const [percentChange, setPercentChange] = useState(0);
+	const [isUploading, setIsUploading] = useState(false);
 
 	// Chakra Color Mode
 	const textColor = useColorModeValue('secondaryGray.900', 'white');
@@ -257,6 +258,14 @@ export default function TotalSpent(props: { [x: string]: any }) {
 					)}
 				</Box>
 			</Flex>
+			<Button
+				mt='20px'
+				variant='brand'
+				onClick={() => (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()}
+				isLoading={isUploading}
+			>
+				Select File
+			</Button>
 		</Card>
 	);
 }

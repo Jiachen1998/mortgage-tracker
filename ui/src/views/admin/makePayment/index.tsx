@@ -88,7 +88,7 @@ export default function MakePayment() {
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Card>
         <CardHeader>
-          <Heading size='md'>Make Payment</Heading>
+          <Heading size='md'>Log Payment</Heading>
         </CardHeader>
         <CardBody>
           <form onSubmit={handleSubmit}>
