@@ -34,10 +34,10 @@ import ComplexTable from 'views/admin/default/components/ComplexTable';
 import DailyTraffic from 'views/admin/default/components/DailyTraffic';
 import PieCard from 'views/admin/default/components/PieCard';
 import Tasks from 'views/admin/default/components/Tasks';
-import TotalSpent from 'views/admin/default/components/TotalSpent';
-import WeeklyRevenue from 'views/admin/default/components/WeeklyRevenue';
 import tableDataCheck from 'views/admin/default/variables/tableDataCheck';
 import tableDataComplex from 'views/admin/default/variables/tableDataComplex';
+import CumulativeDeposits from 'views/admin/default/components/CumulativeDeposits';
+import MonthlyDeposits from 'views/admin/default/components/MonthlyDeposits';
 
 export default function UserReports() {
 	// Chakra Color Mode
@@ -114,8 +114,8 @@ export default function UserReports() {
 			</SimpleGrid>
 
 			<SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-				<TotalSpent />
-				<WeeklyRevenue />
+				<CumulativeDeposits />
+				<MonthlyDeposits />
 			</SimpleGrid>
 			{/* <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
 				<CheckTable tableData={tableDataCheck} />
