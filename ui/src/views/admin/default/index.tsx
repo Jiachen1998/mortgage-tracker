@@ -34,10 +34,10 @@ import ComplexTable from 'views/admin/default/components/ComplexTable';
 import DailyTraffic from 'views/admin/default/components/DailyTraffic';
 import PieCard from 'views/admin/default/components/PieCard';
 import Tasks from 'views/admin/default/components/Tasks';
-import TotalSpent from 'views/admin/default/components/TotalSpent';
-import WeeklyRevenue from 'views/admin/default/components/WeeklyRevenue';
 import tableDataCheck from 'views/admin/default/variables/tableDataCheck';
 import tableDataComplex from 'views/admin/default/variables/tableDataComplex';
+import CumulativeDeposits from 'views/admin/default/components/CumulativeDeposits';
+import MonthlyDeposits from 'views/admin/default/components/MonthlyDeposits';
 
 export default function UserReports() {
 	// Chakra Color Mode
@@ -46,7 +46,7 @@ export default function UserReports() {
 	return (
 		<Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
 			<SimpleGrid columns={{ base: 1, md: 2, lg: 3, '2xl': 6 }} gap='20px' mb='20px'>
-				<MiniStatistics
+				{/* <MiniStatistics
 					startContent={
 						<IconBox
 							w='56px'
@@ -110,14 +110,14 @@ export default function UserReports() {
 					}
 					name='Total Projects'
 					value='2935'
-				/>
+				/> */}
 			</SimpleGrid>
 
 			<SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px' mb='20px'>
-				<TotalSpent />
-				<WeeklyRevenue />
+				<CumulativeDeposits />
+				<MonthlyDeposits />
 			</SimpleGrid>
-			<SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
+			{/* <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
 				<CheckTable tableData={tableDataCheck} />
 				<SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
 					<DailyTraffic />
@@ -130,7 +130,7 @@ export default function UserReports() {
 					<Tasks />
 					<MiniCalendar h='100%' minW='100%' selectRange={false} />
 				</SimpleGrid>
-			</SimpleGrid>
+			</SimpleGrid> */}
 		</Box>
 	);
 }
