@@ -95,12 +95,14 @@ export default function MonthlyDeposits(props: { [x: string]: any }) {
     }, []);
 
     return (
-        <Card alignItems='center' flexDirection='column' w='100%' {...rest}>
-            <Flex align='center' w='100%' px='15px' py='10px'>
-                <Text me='auto' color={textColor} fontSize='xl' fontWeight='700' lineHeight='100%'>
+        <Card alignItems='center' flexDirection='column' w='100%' h='100%' {...rest}>
+            <Flex align='center' justify='center' w='100%' px='15px' py='10px' position='relative'>
+                <Text color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' textAlign='center'>
                     Monthly Deposits by Client
                 </Text>
                 <Button
+                    position='absolute'
+                    right='15px'
                     alignItems='center'
                     justifyContent='center'
                     bg={bgButton}
@@ -116,13 +118,13 @@ export default function MonthlyDeposits(props: { [x: string]: any }) {
                 </Button>
             </Flex>
 
-            <Box h='240px' mt='auto' w='100%'>
+            <Box h='100%' w='100%' mt='auto' px='10px'>
                 {loading ? (
-                    <Flex justifyContent="center" alignItems="center" height="240px">
+                    <Flex justifyContent="center" alignItems="center" height="100%">
                         <Spinner size="xl" color={iconColor} />
                     </Flex>
                 ) : chartData.length === 0 ? (
-                    <Flex justifyContent="center" alignItems="center" height="240px">
+                    <Flex justifyContent="center" alignItems="center" height="100%">
                         <Text color={textColor}>No transaction data available</Text>
                     </Flex>
                 ) : (

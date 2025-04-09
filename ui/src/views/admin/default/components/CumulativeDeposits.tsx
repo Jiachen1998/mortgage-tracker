@@ -100,20 +100,75 @@ export default function CumulativeDeposits(props: { [x: string]: any }) {
                             }
                         },
                         axisBorder: {
-                            show: false
+                            show: true,
+                            color: '#A3AED0',
+                            height: 1,
+                            width: '100%',
+                            offsetX: 0,
+                            offsetY: 0
                         },
                         axisTicks: {
-                            show: false
+                            show: true,
+                            color: '#A3AED0',
+                            height: 6,
+                            offsetX: 0,
+                            offsetY: 0
                         }
                     },
                     yaxis: {
-                        show: false
+                        show: true,
+                        labels: {
+                            style: {
+                                colors: '#A3AED0',
+                                fontSize: '12px',
+                                fontWeight: '500'
+                            },
+                            formatter: function(value: number) {
+                                return '$' + value.toLocaleString();
+                            }
+                        },
+                        axisBorder: {
+                            show: true,
+                            color: '#A3AED0',
+                            width: 1,
+                            offsetX: 0,
+                            offsetY: 0
+                        },
+                        axisTicks: {
+                            show: true,
+                            color: '#A3AED0',
+                            width: 6,
+                            offsetX: 0,
+                            offsetY: 0
+                        }
                     },
                     legend: {
                         show: true
                     },
                     grid: {
-                        show: false
+                        show: true,
+                        borderColor: '#A3AED0',
+                        position: 'back',
+                        xaxis: {
+                            lines: {
+                                show: false
+                            }
+                        },
+                        yaxis: {
+                            lines: {
+                                show: true,
+                                style: {
+                                    colors: ['rgba(163, 174, 208, 0.2)'],
+                                    strokeWidth: 1
+                                }
+                            }
+                        },
+                        padding: {
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 15
+                        }
                     }
                 });
 
@@ -128,14 +183,14 @@ export default function CumulativeDeposits(props: { [x: string]: any }) {
     }, []);
 
     return (
-        <Card justifyContent='center' alignItems='center' flexDirection='column' w='100%' mb='0px' {...rest}>
-            <Flex align='center' justify='space-between' w='100%' pe='20px' pt='5px'>
-                <Button bg={boxBg} fontSize='sm' fontWeight='500' color={textColorSecondary} borderRadius='7px'>
-                    <Icon as={MdOutlineCalendarToday} color={textColorSecondary} me='4px' />
-                    This month
-                </Button>
+        <Card justifyContent='center' alignItems='center' flexDirection='column' w='100%' h='100%' mb='0px' {...rest}>
+            <Flex align='center' justify='center' w='100%' px='15px' py='10px' position='relative'>
+                <Text color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' textAlign='center'>
+                    Cumulative Deposits
+                </Text>
                 <Button
-                    ms='auto'
+                    position='absolute'
+                    right='15px'
                     alignItems='center'
                     justifyContent='center'
                     bg={bgButton}
@@ -150,31 +205,15 @@ export default function CumulativeDeposits(props: { [x: string]: any }) {
                     <Icon as={MdBarChart} color={iconColor} w='24px' h='24px' />
                 </Button>
             </Flex>
-            <Flex w='100%' flexDirection={{ base: 'column', lg: 'row' }}>
-                <Flex flexDirection='column' me='20px' mt='28px'>
-                    <Text color={textColor} fontSize='34px' textAlign='start' fontWeight='700' lineHeight='100%'>
-                        ${totalDeposit.toFixed(0)}
-                    </Text>
-                    <Flex align='center' mb='20px'>
-                        <Text color='secondaryGray.600' fontSize='sm' fontWeight='500' mt='4px' me='12px'>
-                            Total Deposits
-                        </Text>
-                    </Flex>
 
-                    <Flex align='center'>
-                        <Icon as={IoCheckmarkCircle} color='green.500' me='4px' />
-                        <Text color='green.500' fontSize='md' fontWeight='700'>
-                            On track
-                        </Text>
-                    </Flex>
-                </Flex>
-                <Box minH='260px' minW='75%' mt='auto'>
+            <Flex w='100%' h='100%' flexDirection={{ base: 'column', lg: 'row' }}>
+                <Box h='100%' w='100%' mt='auto' px='10px'>
                     {loading ? (
-                        <Flex justifyContent="center" alignItems="center" height="260px">
+                        <Flex justifyContent="center" alignItems="center" height="100%">
                             <Spinner size="xl" color={iconColor} />
                         </Flex>
                     ) : chartData.length === 0 ? (
-                        <Flex justifyContent="center" alignItems="center" height="260px">
+                        <Flex justifyContent="center" alignItems="center" height="100%">
                             <Text color={textColorSecondary}>No transaction data available</Text>
                         </Flex>
                     ) : (
