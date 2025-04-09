@@ -1,17 +1,19 @@
 // Chakra imports
-import { Box, Button, Flex, Icon, Text, useColorModeValue, Spinner } from '@chakra-ui/react';
+import { Box, Button, Flex, Icon, Text, useColorModeValue, Spinner, Select } from '@chakra-ui/react';
 import Card from 'components/card/Card';
 // Custom components
 import BarChart from 'components/charts/BarChart';
 import React, { useEffect, useState } from 'react';
 import { MdBarChart } from 'react-icons/md';
-import { ChartSeries, fetchTransactions, processTransactionData, createBarChartSeries } from 'utils/transactionUtils';
+import { ChartSeries, fetchTransactions, processTransactionData, createBarChartSeries, filterTransactionsByDateRange, getDateRangeOptions } from 'utils/transactionUtils';
 
 export default function MonthlyDeposits(props: { [x: string]: any }) {
     const { ...rest } = props;
     const [chartData, setChartData] = useState<ChartSeries[]>([]);
     const [chartOptions, setChartOptions] = useState<any>({});
     const [loading, setLoading] = useState(true);
+    const [dateRange, setDateRange] = useState('6'); // Default to 12 months
+    const [allTransactions, setAllTransactions] = useState<any[]>([]);
 
     // Chakra Color Mode
     const textColor = useColorModeValue('secondaryGray.900', 'white');
@@ -25,66 +27,8 @@ export default function MonthlyDeposits(props: { [x: string]: any }) {
             try {
                 setLoading(true);
                 const transactions = await fetchTransactions();
-                const { clientData, months } = processTransactionData(transactions);
-                const series = createBarChartSeries(clientData, months);
-
-                setChartData(series);
-                setChartOptions({
-                    chart: {
-                        toolbar: {
-                            show: false
-                        },
-                        dropShadow: {
-                            enabled: true,
-                            top: 13,
-                            left: 0,
-                            blur: 10,
-                            opacity: 0.1,
-                            color: '#4318FF'
-                        }
-                    },
-                    plotOptions: {
-                        bar: {
-                            borderRadius: 4,
-                            columnWidth: '70%'
-                        }
-                    },
-                    colors: ['#4318FF', '#39B8FF', '#FF5733', '#33FF57', '#5733FF', '#33FFEC'],
-                    tooltip: {
-                        theme: 'dark'
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    xaxis: {
-                        type: 'category',
-                        categories: months,
-                        labels: {
-                            style: {
-                                colors: '#A3AED0',
-                                fontSize: '12px',
-                                fontWeight: '500'
-                            }
-                        },
-                        axisBorder: {
-                            show: false
-                        },
-                        axisTicks: {
-                            show: false
-                        }
-                    },
-                    yaxis: {
-                        show: false
-                    },
-                    legend: {
-                        show: true
-                    },
-                    grid: {
-                        show: false
-                    }
-                });
-
-                setLoading(false);
+                setAllTransactions(transactions);
+                updateChartData(transactions, parseInt(dateRange));
             } catch (error) {
                 console.error('Error fetching transactions:', error);
                 setLoading(false);
@@ -94,12 +38,107 @@ export default function MonthlyDeposits(props: { [x: string]: any }) {
         loadData();
     }, []);
 
+    const updateChartData = (transactions: any[], months: number) => {
+        console.log('Updating chart data:', { transactionsCount: transactions.length, months });
+        const filteredTransactions = filterTransactionsByDateRange(transactions, months);
+        const { clientData, months: processedMonths } = processTransactionData(filteredTransactions);
+        const series = createBarChartSeries(clientData, processedMonths);
+        console.log('Processed chart data:', { 
+            seriesCount: series.length,
+            processedMonths,
+            firstSeries: series[0]
+        });
+
+        setChartData(series);
+        setChartOptions({
+            chart: {
+                toolbar: {
+                    show: false
+                },
+                dropShadow: {
+                    enabled: true,
+                    top: 13,
+                    left: 0,
+                    blur: 10,
+                    opacity: 0.1,
+                    color: '#4318FF'
+                }
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    columnWidth: '70%'
+                }
+            },
+            colors: ['#4318FF', '#39B8FF', '#FF5733', '#33FF57', '#5733FF', '#33FFEC'],
+            tooltip: {
+                theme: 'dark'
+            },
+            dataLabels: {
+                enabled: false
+            },
+            xaxis: {
+                type: 'category',
+                categories: processedMonths,
+                labels: {
+                    style: {
+                        colors: '#A3AED0',
+                        fontSize: '12px',
+                        fontWeight: '500'
+                    }
+                },
+                axisBorder: {
+                    show: false
+                },
+                axisTicks: {
+                    show: false
+                }
+            },
+            yaxis: {
+                show: false
+            },
+            legend: {
+                show: true
+            },
+            grid: {
+                show: false
+            }
+        });
+        setLoading(false);
+    };
+
+    const handleDateRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newRange = e.target.value;
+        console.log('Date range changed:', { newRange, currentRange: dateRange });
+        setDateRange(newRange);
+        updateChartData(allTransactions, parseInt(newRange));
+    };
+
     return (
         <Card alignItems='center' flexDirection='column' w='100%' h='100%' {...rest}>
             <Flex align='center' justify='center' w='100%' px='15px' py='10px' position='relative'>
                 <Text color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' textAlign='center'>
                     Monthly Deposits by Client
                 </Text>
+                <Select
+                    position='absolute'
+                    right='60px'
+                    w='120px'
+                    size='sm'
+                    value={dateRange}
+                    onChange={handleDateRangeChange}
+                    bg={bgButton}
+                    color={textColor}
+                    borderColor={bgButton}
+                    _hover={{ borderColor: bgHover.bg }}
+                    _focus={{ borderColor: bgFocus.bg }}
+                >
+                    {getDateRangeOptions().map(option => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </Select>
                 <Button
                     position='absolute'
                     right='15px'
@@ -128,7 +167,7 @@ export default function MonthlyDeposits(props: { [x: string]: any }) {
                         <Text color={textColor}>No transaction data available</Text>
                     </Flex>
                 ) : (
-                    <BarChart chartData={chartData} chartOptions={chartOptions} />
+                    <BarChart key={`monthly-${dateRange}`} chartData={chartData} chartOptions={chartOptions} />
                 )}
             </Box>
         </Card>

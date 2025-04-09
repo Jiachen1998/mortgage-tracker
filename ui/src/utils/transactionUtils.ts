@@ -68,4 +68,28 @@ export const createBarChartSeries = (clientData: { [key: string]: { [key: string
       data
     };
   });
-}; 
+};
+
+export const filterTransactionsByDateRange = (transactions: Transaction[], months: number): Transaction[] => {
+    const endDate = new Date(); // Current date
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - months);
+    console.log('Filtering transactions:', {
+        totalTransactions: transactions.length,
+        months,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+    });
+    const filtered = transactions.filter(transaction => {
+        const transactionDate = new Date(transaction.Date);
+        return transactionDate >= startDate && transactionDate <= endDate;
+    });
+    console.log('Filtered transactions:', filtered.length);
+    return filtered;
+};
+
+export const getDateRangeOptions = () => [
+    { value: '3', label: '3 Months' },
+    { value: '6', label: '6 Months' },
+    { value: '12', label: '12 Months' }
+]; 
