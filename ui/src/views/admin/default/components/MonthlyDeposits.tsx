@@ -7,12 +7,68 @@ import React, { useEffect, useState } from 'react';
 import { MdBarChart } from 'react-icons/md';
 import { ChartSeries, fetchTransactions, processTransactionData, createBarChartSeries, filterTransactionsByDateRange, getDateRangeOptions } from 'utils/transactionUtils';
 
+// Static chart options
+const defaultChartOptions = {
+    chart: {
+        toolbar: {
+            show: false
+        },
+        dropShadow: {
+            enabled: true,
+            top: 13,
+            left: 0,
+            blur: 10,
+            opacity: 0.1,
+            color: '#4318FF'
+        }
+    },
+    plotOptions: {
+        bar: {
+            borderRadius: 4,
+            columnWidth: '70%'
+        }
+    },
+    colors: ['#4318FF', '#39B8FF', '#FF5733', '#33FF57', '#5733FF', '#33FFEC'],
+    tooltip: {
+        theme: 'dark'
+    },
+    dataLabels: {
+        enabled: false
+    },
+    xaxis: {
+        type: 'category',
+        categories: [] as string[],
+        labels: {
+            style: {
+                colors: '#A3AED0',
+                fontSize: '12px',
+                fontWeight: '500'
+            }
+        },
+        axisBorder: {
+            show: false
+        },
+        axisTicks: {
+            show: false
+        }
+    },
+    yaxis: {
+        show: false
+    },
+    legend: {
+        show: true
+    },
+    grid: {
+        show: false
+    }
+};
+
 export default function MonthlyDeposits(props: { [x: string]: any }) {
     const { ...rest } = props;
     const [chartData, setChartData] = useState<ChartSeries[]>([]);
-    const [chartOptions, setChartOptions] = useState<any>({});
+    const [chartOptions, setChartOptions] = useState<any>(defaultChartOptions);
     const [loading, setLoading] = useState(true);
-    const [dateRange, setDateRange] = useState('6'); // Default to 12 months
+    const [dateRange, setDateRange] = useState('6'); // Default to 6 months
     const [allTransactions, setAllTransactions] = useState<any[]>([]);
 
     // Chakra Color Mode
@@ -41,7 +97,7 @@ export default function MonthlyDeposits(props: { [x: string]: any }) {
     const updateChartData = (transactions: any[], months: number) => {
         console.log('Updating chart data:', { transactionsCount: transactions.length, months });
         const filteredTransactions = filterTransactionsByDateRange(transactions, months);
-        const { clientData, months: processedMonths } = processTransactionData(filteredTransactions);
+        const { clientData, months: processedMonths } = processTransactionData(filteredTransactions, months);
         const series = createBarChartSeries(clientData, processedMonths);
         console.log('Processed chart data:', { 
             seriesCount: series.length,
@@ -51,57 +107,10 @@ export default function MonthlyDeposits(props: { [x: string]: any }) {
 
         setChartData(series);
         setChartOptions({
-            chart: {
-                toolbar: {
-                    show: false
-                },
-                dropShadow: {
-                    enabled: true,
-                    top: 13,
-                    left: 0,
-                    blur: 10,
-                    opacity: 0.1,
-                    color: '#4318FF'
-                }
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 4,
-                    columnWidth: '70%'
-                }
-            },
-            colors: ['#4318FF', '#39B8FF', '#FF5733', '#33FF57', '#5733FF', '#33FFEC'],
-            tooltip: {
-                theme: 'dark'
-            },
-            dataLabels: {
-                enabled: false
-            },
+            ...chartOptions,
             xaxis: {
-                type: 'category',
-                categories: processedMonths,
-                labels: {
-                    style: {
-                        colors: '#A3AED0',
-                        fontSize: '12px',
-                        fontWeight: '500'
-                    }
-                },
-                axisBorder: {
-                    show: false
-                },
-                axisTicks: {
-                    show: false
-                }
-            },
-            yaxis: {
-                show: false
-            },
-            legend: {
-                show: true
-            },
-            grid: {
-                show: false
+                ...chartOptions.xaxis,
+                categories: processedMonths
             }
         });
         setLoading(false);

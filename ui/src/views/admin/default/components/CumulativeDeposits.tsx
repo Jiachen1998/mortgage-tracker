@@ -23,13 +23,137 @@ const createCumulativeLineChartSeries = (clientData: { [key: string]: { [key: st
     });
 };
 
+// Static chart options
+const defaultChartOptions = {
+    chart: {
+        toolbar: {
+            show: false
+        },
+        dropShadow: {
+            enabled: true,
+            top: 13,
+            left: 0,
+            blur: 10,
+            opacity: 0.1,
+            color: '#4318FF'
+        }
+    },
+    colors: ['#4318FF', '#39B8FF', '#FF5733', '#33FF57', '#5733FF', '#33FFEC'],
+    markers: {
+        size: 0,
+        colors: 'white',
+        strokeColors: '#7551FF',
+        strokeWidth: 3,
+        strokeOpacity: 0.9,
+        strokeDashArray: 0,
+        fillOpacity: 1,
+        discrete: [] as any[],
+        shape: 'circle',
+        radius: 2,
+        offsetX: 0,
+        offsetY: 0,
+        showNullDataPoints: true
+    },
+    tooltip: {
+        theme: 'dark'
+    },
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        curve: 'smooth',
+        type: 'line'
+    },
+    xaxis: {
+        type: 'category',
+        categories: [] as string[],
+        labels: {
+            style: {
+                colors: '#A3AED0',
+                fontSize: '12px',
+                fontWeight: '500'
+            }
+        },
+        axisBorder: {
+            show: true,
+            color: '#A3AED0',
+            height: 1,
+            width: '100%',
+            offsetX: 0,
+            offsetY: 0
+        },
+        axisTicks: {
+            show: true,
+            color: '#A3AED0',
+            height: 6,
+            offsetX: 0,
+            offsetY: 0
+        }
+    },
+    yaxis: {
+        show: true,
+        labels: {
+            style: {
+                colors: '#A3AED0',
+                fontSize: '12px',
+                fontWeight: '500'
+            },
+            formatter: function(value: number) {
+                return '$' + value.toLocaleString();
+            }
+        },
+        axisBorder: {
+            show: true,
+            color: '#A3AED0',
+            width: 1,
+            offsetX: 0,
+            offsetY: 0
+        },
+        axisTicks: {
+            show: true,
+            color: '#A3AED0',
+            width: 6,
+            offsetX: 0,
+            offsetY: 0
+        }
+    },
+    legend: {
+        show: true
+    },
+    grid: {
+        show: true,
+        borderColor: '#A3AED0',
+        position: 'back',
+        xaxis: {
+            lines: {
+                show: false
+            }
+        },
+        yaxis: {
+            lines: {
+                show: true,
+                style: {
+                    colors: ['rgba(163, 174, 208, 0.2)'],
+                    strokeWidth: 1
+                }
+            }
+        },
+        padding: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 15
+        }
+    }
+};
+
 export default function CumulativeDeposits(props: { [x: string]: any }) {
     const { ...rest } = props;
     const [chartData, setChartData] = useState<ChartSeries[]>([]);
-    const [chartOptions, setChartOptions] = useState<any>({});
+    const [chartOptions, setChartOptions] = useState<any>(defaultChartOptions);
     const [loading, setLoading] = useState(true);
     const [totalDeposit, setTotalDeposit] = useState(0);
-    const [dateRange, setDateRange] = useState('6'); // Default to 12 months
+    const [dateRange, setDateRange] = useState('6'); // Default to 6 months
     const [allTransactions, setAllTransactions] = useState<any[]>([]);
 
     // Chakra Color Mode
@@ -60,7 +184,7 @@ export default function CumulativeDeposits(props: { [x: string]: any }) {
     const updateChartData = (transactions: any[], months: number) => {
         console.log('Updating chart data:', { transactionsCount: transactions.length, months });
         const filteredTransactions = filterTransactionsByDateRange(transactions, months);
-        const { clientData, months: processedMonths, total } = processTransactionData(filteredTransactions);
+        const { clientData, months: processedMonths, total } = processTransactionData(filteredTransactions, months);
         const series = createCumulativeLineChartSeries(clientData, processedMonths);
         console.log('Processed chart data:', { 
             seriesCount: series.length,
@@ -71,125 +195,10 @@ export default function CumulativeDeposits(props: { [x: string]: any }) {
         setTotalDeposit(total);
         setChartData(series);
         setChartOptions({
-            chart: {
-                toolbar: {
-                    show: false
-                },
-                dropShadow: {
-                    enabled: true,
-                    top: 13,
-                    left: 0,
-                    blur: 10,
-                    opacity: 0.1,
-                    color: '#4318FF'
-                }
-            },
-            colors: ['#4318FF', '#39B8FF', '#FF5733', '#33FF57', '#5733FF', '#33FFEC'],
-            markers: {
-                size: 0,
-                colors: 'white',
-                strokeColors: '#7551FF',
-                strokeWidth: 3,
-                strokeOpacity: 0.9,
-                strokeDashArray: 0,
-                fillOpacity: 1,
-                discrete: [],
-                shape: 'circle',
-                radius: 2,
-                offsetX: 0,
-                offsetY: 0,
-                showNullDataPoints: true
-            },
-            tooltip: {
-                theme: 'dark'
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                type: 'line'
-            },
+            ...chartOptions,
             xaxis: {
-                type: 'category',
-                categories: processedMonths,
-                labels: {
-                    style: {
-                        colors: '#A3AED0',
-                        fontSize: '12px',
-                        fontWeight: '500'
-                    }
-                },
-                axisBorder: {
-                    show: true,
-                    color: '#A3AED0',
-                    height: 1,
-                    width: '100%',
-                    offsetX: 0,
-                    offsetY: 0
-                },
-                axisTicks: {
-                    show: true,
-                    color: '#A3AED0',
-                    height: 6,
-                    offsetX: 0,
-                    offsetY: 0
-                }
-            },
-            yaxis: {
-                show: true,
-                labels: {
-                    style: {
-                        colors: '#A3AED0',
-                        fontSize: '12px',
-                        fontWeight: '500'
-                    },
-                    formatter: function(value: number) {
-                        return '$' + value.toLocaleString();
-                    }
-                },
-                axisBorder: {
-                    show: true,
-                    color: '#A3AED0',
-                    width: 1,
-                    offsetX: 0,
-                    offsetY: 0
-                },
-                axisTicks: {
-                    show: true,
-                    color: '#A3AED0',
-                    width: 6,
-                    offsetX: 0,
-                    offsetY: 0
-                }
-            },
-            legend: {
-                show: true
-            },
-            grid: {
-                show: true,
-                borderColor: '#A3AED0',
-                position: 'back',
-                xaxis: {
-                    lines: {
-                        show: false
-                    }
-                },
-                yaxis: {
-                    lines: {
-                        show: true,
-                        style: {
-                            colors: ['rgba(163, 174, 208, 0.2)'],
-                            strokeWidth: 1
-                        }
-                    }
-                },
-                padding: {
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 15
-                }
+                ...chartOptions.xaxis,
+                categories: processedMonths
             }
         });
         setLoading(false);
