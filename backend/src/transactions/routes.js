@@ -212,59 +212,135 @@ router.post('/bulk', upload.single('file'), async (req, res) => {
     // Create a readable stream from the buffer
     const stream = Readable.from(req.file.buffer);
     
+    // Helper function to extract client name from column header
+    const extractClientName = (header) => {
+      // Check if the header ends with " Deposit"
+      if (header.endsWith(' Deposit')) {
+        // Return everything before " Deposit"
+        return header.slice(0, -8); // Remove " Deposit" (8 characters)
+      }
+      return null;
+    };
+    
     // Process the CSV file
     await new Promise((resolve, reject) => {
+      let headers = null;
       stream
         .pipe(csv())
+        .on('headers', (columnHeaders) => {
+          // Save headers for later use
+          headers = columnHeaders;
+          console.log('CSV Headers:', headers);
+        })
         .on('data', (data) => {
-          // Validate required fields
-          if (!data.Date || !data['Client A Deposit'] || !data['Client B Deposit']) {
-            errors.push({ row: processed + 1, error: 'Missing required fields' });
+          // Validate Date field
+          if (!data.Date) {
+            errors.push({ row: processed + 1, error: 'Missing Date field' });
             processed++;
             return;
           }
 
-          // Parse the date
-          const date = new Date(data.Date);
-          if (isNaN(date.getTime())) {
-            errors.push({ row: processed + 1, error: 'Invalid date format' });
+          // Parse the date - improved date handling
+          let date;
+          try {
+            console.log('Date string to parse:', data.Date);
+            
+            // If the date is in format like "Saturday, June 29, 2024"
+            if (data.Date.includes(',')) {
+              // Remove the day of week part if present
+              const dateWithoutDay = data.Date.split(',').slice(1).join(',').trim();
+              console.log('Date without day of week:', dateWithoutDay);
+              date = new Date(dateWithoutDay);
+            } else {
+              date = new Date(data.Date);
+            }
+            
+            // Verify the date is valid
+            if (isNaN(date.getTime())) {
+              throw new Error('Invalid date format');
+            }
+            
+            console.log('Parsed date:', date);
+          } catch (error) {
+            console.error('Date parsing error:', error);
+            errors.push({ row: processed + 1, error: 'Invalid date format: ' + data.Date });
             processed++;
             return;
           }
-
-          // Parse the deposit amounts
-          const clientADeposit = parseFloat(data['Client A Deposit']);
-          const clientBDeposit = parseFloat(data['Client B Deposit']);
-          if (isNaN(clientADeposit) || isNaN(clientBDeposit)) {
-            errors.push({ row: processed + 1, error: 'Invalid deposit amount' });
+          
+          // Find and process deposit columns
+          const depositColumns = headers.filter(header => header.endsWith(' Deposit'));
+          
+          if (depositColumns.length === 0) {
+            errors.push({ row: processed + 1, error: 'No deposit columns found' });
             processed++;
             return;
           }
-
-          results.push({
-            Date: date,
-            ClientA_Deposit: clientADeposit,
-            ClientB_Deposit: clientBDeposit
-          });
+          
+          // Process each client's deposit as a separate transaction
+          for (const depositColumn of depositColumns) {
+            // Skip if value is empty
+            if (!data[depositColumn] || data[depositColumn].trim() === '') {
+              continue;
+            }
+            
+            // Extract client name
+            const clientName = extractClientName(depositColumn);
+            
+            if (!clientName) {
+              console.warn(`Couldn't extract client name from ${depositColumn}`);
+              continue;
+            }
+            
+            // Parse deposit amount - remove commas
+            const depositValue = data[depositColumn].replace(/,/g, '');
+            const deposit = parseFloat(depositValue);
+            
+            if (isNaN(deposit)) {
+              errors.push({ 
+                row: processed + 1, 
+                error: `Invalid deposit amount for ${clientName}` 
+              });
+              continue;
+            }
+            
+            // Create transaction document in the original schema format
+            const doc = {
+              Date: date,
+              Client: clientName,
+              Deposit: deposit
+            };
+            
+            console.log('Processed document:', doc);
+            results.push(doc);
+          }
+          
           processed++;
         })
         .on('end', resolve)
         .on('error', reject);
     });
 
+    if(errors.length > 0){
+      console.log('Errors:', errors);
+    }
+
     // Bulk upsert the transactions
     const bulkOps = results.map(doc => ({
       updateOne: {
         filter: { 
-          Date: doc.Date
+          Date: doc.Date,
+          Client: doc.Client
         },
         update: { $set: doc },
         upsert: true
       }
     }));
 
+    console.log(`Preparing to perform ${bulkOps.length} operations`);
     if (bulkOps.length > 0) {
-      await Transaction.bulkWrite(bulkOps);
+      const result = await Transaction.bulkWrite(bulkOps);
+      console.log('Bulk write result:', result);
     }
 
     res.status(200).json({
