@@ -69,7 +69,7 @@ export default function BulkUpload() {
 					</Text>
 					<Text color={textColorSecondary} fontSize='md' fontWeight='400' mb='20px'>
 						Upload a CSV file containing transaction data. The file should have the following columns:
-						Date, Client, Deposit
+						Date, Client A Deposit, Client B Deposit
 					</Text>
 					
 					<Box

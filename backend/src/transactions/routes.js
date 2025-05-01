@@ -218,7 +218,7 @@ router.post('/bulk', upload.single('file'), async (req, res) => {
         .pipe(csv())
         .on('data', (data) => {
           // Validate required fields
-          if (!data.Date || !data.Client || !data.Deposit) {
+          if (!data.Date || !data['Client A Deposit'] || !data['Client B Deposit']) {
             errors.push({ row: processed + 1, error: 'Missing required fields' });
             processed++;
             return;
@@ -232,9 +232,10 @@ router.post('/bulk', upload.single('file'), async (req, res) => {
             return;
           }
 
-          // Parse the deposit amount
-          const deposit = parseFloat(data.Deposit);
-          if (isNaN(deposit)) {
+          // Parse the deposit amounts
+          const clientADeposit = parseFloat(data['Client A Deposit']);
+          const clientBDeposit = parseFloat(data['Client B Deposit']);
+          if (isNaN(clientADeposit) || isNaN(clientBDeposit)) {
             errors.push({ row: processed + 1, error: 'Invalid deposit amount' });
             processed++;
             return;
@@ -242,8 +243,8 @@ router.post('/bulk', upload.single('file'), async (req, res) => {
 
           results.push({
             Date: date,
-            Client: data.Client,
-            Deposit: deposit
+            ClientA_Deposit: clientADeposit,
+            ClientB_Deposit: clientBDeposit
           });
           processed++;
         })
@@ -255,8 +256,7 @@ router.post('/bulk', upload.single('file'), async (req, res) => {
     const bulkOps = results.map(doc => ({
       updateOne: {
         filter: { 
-          Date: doc.Date,
-          Client: doc.Client
+          Date: doc.Date
         },
         update: { $set: doc },
         upsert: true
