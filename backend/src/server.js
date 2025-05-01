@@ -40,7 +40,7 @@ const options = {
         }
       }
     },
-    apis: ['./transactions/routes.js'], // Path to the API routes
+    apis: ['./src/transactions/routes.js'], // Updated path to correctly point to the routes file
 };
 const swaggerSpec = swaggerJsdoc(options);
 
