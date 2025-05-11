@@ -20,7 +20,7 @@ export default function Dashboard(props: { [x: string]: any }) {
     return window.location.pathname !== '/admin/full-screen-maps';
   };
   const getActiveRoute = (routes: RoutesType[]): string => {
-    let activeRoute = 'Default Brand Text';
+    let activeRoute = 'Main Dashboard';
     for (let i = 0; i < routes.length; i++) {
       if (
         window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
